@@ -1,43 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TodoInput from './TodoInput';
 import TodoItem from './TodoItem';
 
 const App = () => {
-  // Загрузка данных из localStorage при инициализации состояния
+  // Инициализация состояния из localStorage
+
   const [todos, setTodos] = useState(() => {
     const savedTodos = localStorage.getItem('todos');
     return savedTodos ? JSON.parse(savedTodos) : [];
   });
 
-  // Сохранение задач в localStorage при изменении списка
+  // обновление и синхронизациия localStorage
+
   const updateTodos = (newTodos) => {
-    setTodos((prevTodos) => {
-      const updatedTodos = typeof newTodos === 'function' ? newTodos(prevTodos) : newTodos;
-      localStorage.setItem('todos', JSON.stringify(updatedTodos));
-      return updatedTodos;
-    });
+    setTodos(newTodos);
+    localStorage.setItem('todos', JSON.stringify(newTodos));
   };
 
-
   // Добавление новой задачи
+
   const addTodo = (todoText) => {
     const newTodo = {
       id: Date.now(),
       text: todoText,
       completed: false,
     };
-    setTodos((prevTodos) => [...prevTodos, newTodo]);
+    updateTodos([...todos, newTodo]);
   };
 
   // Удаление задачи
+
   const deleteTodo = (id) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    updateTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  // Переключение статуса задачи (выполнена/не выполнена)
+  // Переключение статуса задачи
+
   const toggleTodo = (id) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
+    updateTodos(
+      todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
